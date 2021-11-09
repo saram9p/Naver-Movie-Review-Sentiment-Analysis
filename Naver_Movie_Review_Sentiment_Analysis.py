@@ -174,7 +174,10 @@ history = model.fit(X_train, y_train, epochs=15, callbacks=[es, mc], batch_size=
 loaded_model = load_model('best_model.h5')
 print("\n 테스트 정확도: %.4f" % (loaded_model.evaluate(X_test, y_test)[1]))
 
+list = [[]]
+
 def sentiment_predict(new_sentence):
+  original = new_sentence
   new_sentence = re.sub(r'[^ㄱ-ㅎㅏ-ㅣ가-힣 ]','', new_sentence)
   new_sentence = okt.morphs(new_sentence, stem=True) # 토큰화
   new_sentence = [word for word in new_sentence if not word in stopwords] # 불용어 제거
@@ -183,11 +186,19 @@ def sentiment_predict(new_sentence):
   score = float(loaded_model.predict(pad_new)) # 예측
   if(score > 0.5):
     print("{:.2f}% 확률로 긍정 리뷰입니다.\n".format(score * 100))
+    list.append((original, "{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100)))
   else:
     print("{:.2f}% 확률로 부정 리뷰입니다.\n".format((1 - score) * 100))
+    list.append((original, "{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100)))
 
 sentiment_predict('영화 보다가 3분만에 나왔다')
 
 sentiment_predict('너무 재밌다')
 
 sentiment_predict('영화가 왜 이럼?')
+
+df = pd.DataFrame(list)
+
+df = df.dropna()
+
+df.to_csv("네이버 영화 리뷰 감성 분류", header=False, index=False)
