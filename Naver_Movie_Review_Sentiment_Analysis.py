@@ -201,4 +201,4 @@ df = pd.DataFrame(list)
 
 df = df.dropna()
 
-df.to_csv("네이버 영화 리뷰 감성 분류", header=False, index=False)
+df.to_csv("네이버 영화 리뷰 감성 분류.csv", header=False, index=False)
